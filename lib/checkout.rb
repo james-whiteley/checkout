@@ -27,13 +27,7 @@ class Checkout
     total = 0
 
     basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }.each do |item, count|
-      if item == :apple || item == :pear
-        total += two_for_one(prices.fetch(item), count)
-      elsif item == :banana || item == :pineapple
-        total += half_price(prices.fetch(item), count, one_per_customer: item == :pineapple)
-      else
-        total += prices.fetch(item) * count
-      end
+      total += apply_discount(item, count)
     end
 
     total
@@ -46,6 +40,26 @@ class Checkout
   # Returns the array of items in the basket.
   def basket
     @basket ||= Array.new
+  end
+
+  # Internal: Apply discount to item where applicable.
+  #
+  # item_price - Item price
+  # count - Count of item in basket
+  #
+  # Returns the item total after applying discount.
+  def apply_discount(item, count)
+    item_total = 0
+
+    if item == :apple || item == :pear
+      item_total += two_for_one(prices.fetch(item), count)
+    elsif item == :banana || item == :pineapple
+      item_total += half_price(prices.fetch(item), count, one_per_customer: item == :pineapple)
+    else
+      item_total += prices.fetch(item) * count
+    end
+
+    item_total
   end
 
   # Internal: Apply two for one discount to price of item in basket.
