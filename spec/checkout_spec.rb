@@ -5,17 +5,7 @@ RSpec.describe Checkout do
   describe '#total' do
     subject(:total) { checkout.total }
 
-    let(:checkout) { Checkout.new(pricing_rules) }
-    let(:pricing_rules) {
-      {
-        apple: 10,
-        orange: 20,
-        pear: 15,
-        banana: 30,
-        pineapple: 100,
-        mango: 200
-      }
-    }
+    let(:checkout) { Checkout.new }
 
     context 'when no offers apply' do
       before do

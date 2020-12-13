@@ -1,15 +1,13 @@
+require 'items'
+
 # Public: Various methods used to scan/add items to a basket
 # and calculate total cost of basket.
 class Checkout
-  # Internal: Returns the hash of item prices.
-  attr_reader :prices
-  private :prices
-
   # Public: Initialize item prices.
   #
   # prices - A hash of item prices.
-  def initialize(prices)
-    @prices = prices
+  def initialize
+    @items = Items.new
   end
 
   # Public: Add item to basket.
@@ -25,8 +23,9 @@ class Checkout
   # Returns the basket total.
   def total
     total = 0
+    item_counts = basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }
 
-    basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }.each do |item, count|
+    item_counts.each do |item, count|
       total += apply_discount(item, count)
     end
 
@@ -50,13 +49,17 @@ class Checkout
   # Returns the item total after applying discount.
   def apply_discount(item, count)
     item_total = 0
+    item_hash = @items.get_item(name: item.to_s)
 
-    if item == :apple || item == :pear
-      item_total += two_for_one(prices.fetch(item), count)
-    elsif item == :banana || item == :pineapple
-      item_total += half_price(prices.fetch(item), count, one_per_customer: item == :pineapple)
+    if item_hash.key?(:discount) && item_hash[:discount].key?(:type)
+      case item_hash[:discount][:type]
+      when 'two_for_one'
+        item_total += two_for_one(item_hash[:price], count)
+      when 'half_price'
+        item_total += half_price(item_hash[:price], count, one_per_customer: item_hash[:discount][:one_per_customer])
+      end
     else
-      item_total += prices.fetch(item) * count
+      item_total += item_hash[:price] * count
     end
 
     item_total
