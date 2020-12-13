@@ -14,7 +14,7 @@ class Checkout
 
   # Public: Add item to basket.
   #
-  # item  - Item name to be added to basket.
+  # item - Item name to be added to basket.
   def scan(item)
     basket << item.to_sym
   end
@@ -28,18 +28,9 @@ class Checkout
 
     basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }.each do |item, count|
       if item == :apple || item == :pear
-        if (count % 2 == 0)
-          total += prices.fetch(item) * (count / 2)
-        else
-          total += prices.fetch(item) * count
-        end
+        total += two_for_one(prices.fetch(item), count)
       elsif item == :banana || item == :pineapple
-        if item == :pineapple
-          total += (prices.fetch(item) / 2)
-          total += (prices.fetch(item)) * (count - 1)
-        else
-          total += (prices.fetch(item) / 2) * count
-        end
+        total += half_price(prices.fetch(item), count, one_per_customer: item == :pineapple)
       else
         total += prices.fetch(item) * count
       end
@@ -55,5 +46,43 @@ class Checkout
   # Returns the array of items in the basket.
   def basket
     @basket ||= Array.new
+  end
+
+  # Internal: Apply two for one discount to price of item in basket.
+  #
+  # item_price - Item price
+  # count - Count of item in basket
+  #
+  # Returns total item price after discount applied.
+  def two_for_one(item_price, count)
+    price = 0
+
+    if (count % 2 == 0)
+      price = item_price * (count / 2)
+    else
+      price = item_price * count
+    end
+
+    price
+  end
+
+  # Internal: Apply half price discount to price of item in basket.
+  #
+  # item_price - Item price
+  # count - Count of item in basket
+  # one_per_customer - True/False apply discount to one/all of particular item in basket
+  #
+  # Returns total item price after discount applied.
+  def half_price(item_price, count, one_per_customer: false)
+    price = 0
+
+    if one_per_customer
+      price = item_price / 2
+      price += item_price * (count - 1)
+    else
+      price = (item_price / 2) * count
+    end
+
+    price
   end
 end
