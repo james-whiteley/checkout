@@ -14,7 +14,7 @@ class Checkout
   #
   # item - Item name to be added to basket.
   def scan(item)
-    basket << item.to_sym
+    basket << item
   end
 
   # Public: Calculate total price of items in the basket,
@@ -57,6 +57,8 @@ class Checkout
         item_total += two_for_one(item_hash[:price], count)
       when 'half_price'
         item_total += half_price(item_hash[:price], count, one_per_customer: item_hash[:discount][:one_per_customer])
+      when 'buy_three_get_one_free'
+        item_total += buy_three_get_one_free(item_hash[:price], count)
       end
     else
       item_total += item_hash[:price] * count
@@ -98,6 +100,24 @@ class Checkout
       price += item_price * (count - 1)
     else
       price = (item_price / 2) * count
+    end
+
+    price
+  end
+
+  # Internal: Apply buy three get one free discount to price of item in basket.
+  #
+  # item_price - Item price
+  # count - Count of item in basket
+  #
+  # Returns total item price after discount applied.
+  def buy_three_get_one_free(item_price, count)
+    price = 0
+
+    if (count % 4 == 0)
+      price = item_price * (count - 1)
+    else
+      price = item_price * count
     end
 
     price

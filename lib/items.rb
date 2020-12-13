@@ -42,7 +42,10 @@ class Items
       },
       {
         name: 'mango',
-        price: 200
+        price: 200,
+        discount: {
+          type: 'buy_three_get_one_free'
+        }
       }
     ]
   end
