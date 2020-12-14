@@ -1,7 +1,6 @@
+# Public: Wrapper for item array to simulate data storage
 class Items
-  attr_reader :items
-  public :items
-
+  # Public: Initialize items array
   def initialize
     @items = [
       {
@@ -50,6 +49,11 @@ class Items
     ]
   end
 
+  # Public: Get item by name
+  #
+  # name - Name of item
+  #
+  # Returns item with given name if found in items array
   def get_item(name:)
     @items.detect { |item| item[:name] == name }
   end

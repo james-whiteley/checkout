@@ -6,6 +6,7 @@ RSpec.describe Checkout do
 
   describe '#scan' do
     let(:basket) { checkout.basket }
+    
     context 'when item is not found' do
       it 'returns item not found exception' do
         scan_response = checkout.scan('grapefruit')
@@ -148,8 +149,7 @@ RSpec.describe Checkout do
 
     context 'when a half price offer applies on pineapples restricted to 1 per customer' do
       before do
-        checkout.scan('pineapple')
-        checkout.scan('pineapple')
+        2.times { checkout.scan('pineapple') }
       end
 
       it 'returns the discounted price for the basket' do
