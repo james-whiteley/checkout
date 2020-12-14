@@ -1,0 +1,175 @@
+* commit e3e9feffe89f4e3bbbfbd02da4595cdaf0791efc
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Mon Dec 14 16:10:58 2020 +0000
+| 
+|     Updated documentation
+| 
+|  doc/Checkout.html          | 338 +++++++++++++++++++++++++++++++++++++++----
+|  doc/Gemfile.html           |   2 +
+|  doc/Gemfile_lock.html      |   2 +
+|  doc/Items.html             | 283 ++++++++++++++++++++++++++++++++++++
+|  doc/code-test_md.html      |   2 +
+|  doc/created.rid            |  10 +-
+|  doc/index.html             |   4 +
+|  doc/js/search_index.js     |   2 +-
+|  doc/js/search_index.js.gz  | Bin 747 -> 1202 bytes
+|  doc/spec/examples_txt.html |   4 +-
+|  doc/table_of_contents.html |  53 +++++++
+|  11 files changed, 665 insertions(+), 35 deletions(-)
+| 
+* commit d8723bb5e4ffdc143f795289992cb4b3345e6280
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Mon Dec 14 15:52:26 2020 +0000
+| 
+|     Removed unnecessary items getter from data class and added doc comments
+| 
+|  lib/items.rb          | 10 +++++++---
+|  spec/checkout_spec.rb |  4 ++--
+|  2 files changed, 9 insertions(+), 5 deletions(-)
+| 
+* commit daac3fe9cc5ca480e7317fb565290b3a62b2a8f5
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Mon Dec 14 15:46:50 2020 +0000
+| 
+|     Added edge case tests for two for one and buy three get one free offers. Modified two_for_one and buy_three_get_one_free methods to take into account edge cases
+| 
+|  lib/checkout.rb       | 33 +++++++++++++++------------------
+|  spec/checkout_spec.rb | 30 ++++++++++++++++++++++++++++++
+|  2 files changed, 45 insertions(+), 18 deletions(-)
+| 
+* commit fddb3515c1e013cce888e107e58183daad43ac74
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Mon Dec 14 14:45:59 2020 +0000
+| 
+|     Changed scan method to get item from data store and add record to basket array, to ensure that data does not need to be queried more than necessary. Added additional inline comments
+| 
+|  lib/checkout.rb       | 55 +++++++++++++++++++++++++++++++------------------
+|  spec/checkout_spec.rb | 14 +++++++++++--
+|  2 files changed, 47 insertions(+), 22 deletions(-)
+| 
+* commit bc4d342a506674cb98a0c302265db4d07b1ef4e9
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Mon Dec 14 12:10:46 2020 +0000
+| 
+|     Modified tests to test contents of basket and include negative cases where item is not found. Added exception handling of items not found to scan method. Moved init of basket array to constructor and modified basket getter to prevent modifying basket from outside class.
+| 
+|  lib/checkout.rb       | 25 +++++++++++++++------
+|  spec/checkout_spec.rb | 58 ++++++++++++++++++++++++++++++++++++++++++++-----
+|  2 files changed, 70 insertions(+), 13 deletions(-)
+| 
+* commit b7ce5469126d49c8c20769d33f224837daa792c2
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Sun Dec 13 19:46:37 2020 +0000
+| 
+|     Added logic for buy three get one free offer to Checkout class. Applied buy three get one free discount to mangos in data store. Modified tests to pass item string rather than symbol as queries against data will search for string.
+| 
+|  lib/checkout.rb       | 22 +++++++++++++++++++++-
+|  lib/items.rb          |  5 ++++-
+|  spec/checkout_spec.rb | 25 ++++++++++++-------------
+|  3 files changed, 37 insertions(+), 15 deletions(-)
+| 
+* commit 5f29b13349a8dbc163d2771057397b65b9715b30
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Sun Dec 13 18:11:00 2020 +0000
+| 
+|     Moved item data to array of hashes wrapped in class. Created getter in Items class to get item based on name passed and made changes to apply_discount to make use of new data representation
+| 
+|  lib/checkout.rb       | 29 +++++++++++++++------------
+|  lib/items.rb          | 53 +++++++++++++++++++++++++++++++++++++++++++++++++
+|  spec/checkout_spec.rb | 12 +----------
+|  3 files changed, 70 insertions(+), 24 deletions(-)
+| 
+* commit 51dee1b2f6e396a47fcb5404160e85c063004ea9
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Sun Dec 13 15:45:29 2020 +0000
+| 
+|     Separated out logic for applying appropriate discount to basket item
+| 
+|  lib/checkout.rb | 28 +++++++++++++++++++++-------
+|  1 file changed, 21 insertions(+), 7 deletions(-)
+| 
+* commit c8f74620908ee398e341aad06caac77ef73faca0
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Sun Dec 13 11:39:26 2020 +0000
+| 
+|     Separated out discount logic into single purpose methods
+| 
+|  lib/checkout.rb | 53 +++++++++++++++++++++++++++++++++++++++++------------
+|  1 file changed, 41 insertions(+), 12 deletions(-)
+| 
+* commit 6d53dc36509ba8a4765c8f7a2d1bac149bf82cfe
+| Author: James Whiteley <jameswhiteley@Jamess-MacBook-Air.local>
+| Date:   Sat Dec 12 16:37:16 2020 +0000
+| 
+|     Added doc comments, generated docs and added appropriate files to .gitignore
+| 
+|  .gitignore                          |   3 +
+|  .rdoc_options                       |  23 ++
+|  doc/Checkout.html                   | 322 +++++++++++++++++++
+|  doc/Gemfile.html                    |  97 ++++++
+|  doc/Gemfile_lock.html               | 121 +++++++
+|  doc/code-test_md.html               | 132 ++++++++
+|  doc/created.rid                     |   8 +
+|  doc/css/fonts.css                   | 167 ++++++++++
+|  doc/css/rdoc.css                    | 590 ++++++++++++++++++++++++++++++++++
+|  doc/fonts/Lato-Light.ttf            | Bin 0 -> 94668 bytes
+|  doc/fonts/Lato-LightItalic.ttf      | Bin 0 -> 94196 bytes
+|  doc/fonts/Lato-Regular.ttf          | Bin 0 -> 96184 bytes
+|  doc/fonts/Lato-RegularItalic.ttf    | Bin 0 -> 95316 bytes
+|  doc/fonts/SourceCodePro-Bold.ttf    | Bin 0 -> 71200 bytes
+|  doc/fonts/SourceCodePro-Regular.ttf | Bin 0 -> 71692 bytes
+|  doc/images/add.png                  | Bin 0 -> 733 bytes
+|  doc/images/arrow_up.png             | Bin 0 -> 372 bytes
+|  doc/images/brick.png                | Bin 0 -> 452 bytes
+|  doc/images/brick_link.png           | Bin 0 -> 764 bytes
+|  doc/images/bug.png                  | Bin 0 -> 774 bytes
+|  doc/images/bullet_black.png         | Bin 0 -> 211 bytes
+|  doc/images/bullet_toggle_minus.png  | Bin 0 -> 207 bytes
+|  doc/images/bullet_toggle_plus.png   | Bin 0 -> 209 bytes
+|  doc/images/date.png                 | Bin 0 -> 626 bytes
+|  doc/images/delete.png               | Bin 0 -> 715 bytes
+|  doc/images/find.png                 | Bin 0 -> 659 bytes
+|  doc/images/loadingAnimation.gif     | Bin 0 -> 5886 bytes
+|  doc/images/macFFBgHack.png          | Bin 0 -> 207 bytes
+|  doc/images/package.png              | Bin 0 -> 853 bytes
+|  doc/images/page_green.png           | Bin 0 -> 621 bytes
+|  doc/images/page_white_text.png      | Bin 0 -> 342 bytes
+|  doc/images/page_white_width.png     | Bin 0 -> 309 bytes
+|  doc/images/plugin.png               | Bin 0 -> 591 bytes
+|  doc/images/ruby.png                 | Bin 0 -> 592 bytes
+|  doc/images/tag_blue.png             | Bin 0 -> 1880 bytes
+|  doc/images/tag_green.png            | Bin 0 -> 613 bytes
+|  doc/images/transparent.png          | Bin 0 -> 97 bytes
+|  doc/images/wrench.png               | Bin 0 -> 610 bytes
+|  doc/images/wrench_orange.png        | Bin 0 -> 584 bytes
+|  doc/images/zoom.png                 | Bin 0 -> 692 bytes
+|  doc/index.html                      |  99 ++++++
+|  doc/js/darkfish.js                  | 161 ++++++++++
+|  doc/js/jquery.js                    |   4 +
+|  doc/js/navigation.js                | 141 ++++++++
+|  doc/js/navigation.js.gz             | Bin 0 -> 1019 bytes
+|  doc/js/search.js                    | 109 +++++++
+|  doc/js/search_index.js              |   1 +
+|  doc/js/search_index.js.gz           | Bin 0 -> 747 bytes
+|  doc/js/searcher.js                  | 229 +++++++++++++
+|  doc/js/searcher.js.gz               | Bin 0 -> 1694 bytes
+|  doc/spec/examples_txt.html          |  90 ++++++
+|  doc/table_of_contents.html          | 108 +++++++
+|  lib/checkout.rb                     |  16 +
+|  53 files changed, 2421 insertions(+)
+| 
+* commit a076993a7807bc53dea01a2d8daf44808c7a418a
+  Author: Sean Kenny <sean.kenny@hotmail.com>
+  Date:   Tue Oct 24 14:48:47 2017 +0100
+  
+      Initial commit
+  
+   .gitignore            |   1 +
+   .rspec                |   1 +
+   Gemfile               |   6 +++
+   Gemfile.lock          |  26 ++++++++++++
+   code-test.md          |  34 ++++++++++++++++
+   lib/checkout.rb       |  43 ++++++++++++++++++++
+   spec/checkout_spec.rb | 105 ++++++++++++++++++++++++++++++++++++++++++++++++
+   spec/spec_helper.rb   |  17 ++++++++
+   8 files changed, 233 insertions(+)
