@@ -7,6 +7,7 @@ class Checkout
   #
   # prices - A hash of item prices.
   def initialize
+    @basket = Array.new
     @items = Items.new
   end
 
@@ -14,7 +15,17 @@ class Checkout
   #
   # item - Item name to be added to basket.
   def scan(item)
-    basket << item
+    begin
+      item_hash = @items.get_item(name: item)
+
+      if item_hash.nil?
+        raise IOError.new 'Item not found.'
+      end
+    rescue IOError => e
+      e
+    else
+      @basket << item
+    end
   end
 
   # Public: Calculate total price of items in the basket,
@@ -23,7 +34,7 @@ class Checkout
   # Returns the basket total.
   def total
     total = 0
-    item_counts = basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }
+    item_counts = @basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }
 
     item_counts.each do |item, count|
       total += apply_discount(item, count)
@@ -32,14 +43,14 @@ class Checkout
     total
   end
 
-  private
-
-  # Internal: Get basket array or initialise if does not exist
+  # Public: Get basket contents
   #
-  # Returns the array of items in the basket.
+  # Returns immutable basket contents.
   def basket
-    @basket ||= Array.new
+    @basket.freeze
   end
+
+  private
 
   # Internal: Apply discount to item where applicable.
   #
