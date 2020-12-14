@@ -34,7 +34,12 @@ RSpec.describe Checkout do
       end
 
       it 'returns item count in basket of five' do
-        expect(basket.length).to eq(5)
+        item_count = 0
+        basket.each do |item|
+          item_count += item[:count]
+        end
+
+        expect(item_count).to eq(5)
       end
     end
 
@@ -47,7 +52,12 @@ RSpec.describe Checkout do
       end
 
       it 'returns item count in basket of 4' do
-        expect(basket.length).to eq(4)
+        item_count = 0
+        basket.each do |item|
+          item_count += item[:count]
+        end
+
+        expect(item_count).to eq(4)
       end
     end
   end

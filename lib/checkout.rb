@@ -3,9 +3,7 @@ require 'items'
 # Public: Various methods used to scan/add items to a basket
 # and calculate total cost of basket.
 class Checkout
-  # Public: Initialize item prices.
-  #
-  # prices - A hash of item prices.
+  # Public: Initialize checkout
   def initialize
     @basket = Array.new
     @items = Items.new
@@ -16,15 +14,28 @@ class Checkout
   # item - Item name to be added to basket.
   def scan(item)
     begin
-      item_hash = @items.get_item(name: item)
+      # Check if one of item is already in basket
+      existing_item_key = @basket.index { |basket_item| basket_item[:name] == item }
 
-      if item_hash.nil?
-        raise IOError.new 'Item not found.'
+      # If not an existing item, create new item in basket
+      if existing_item_key.nil?
+        # Get item from data store by name
+        item_hash = @items.get_item(name: item)
+
+        # If item not found, raise an error
+        if item_hash.nil?
+          raise IOError.new 'Item not found.'
+        else
+          # Else set the item count in the basket and push to basket array
+          item_hash[:count] = 1
+          @basket << item_hash
+        end
+      else
+        # If existing item, increment the item's count in the basket
+        @basket[existing_item_key][:count] = @basket[existing_item_key][:count] + 1
       end
     rescue IOError => e
       e
-    else
-      @basket << item
     end
   end
 
@@ -34,10 +45,10 @@ class Checkout
   # Returns the basket total.
   def total
     total = 0
-    item_counts = @basket.inject(Hash.new(0)) { |items, item| items[item] += 1; items }
 
-    item_counts.each do |item, count|
-      total += apply_discount(item, count)
+    # Loop through basket items, apply discount and sum total.
+    @basket.each do |item|
+      total += apply_discount(item)
     end
 
     total
@@ -58,21 +69,25 @@ class Checkout
   # count - Count of item in basket
   #
   # Returns the item total after applying discount.
-  def apply_discount(item, count)
+  def apply_discount(item)
     item_total = 0
-    item_hash = @items.get_item(name: item.to_s)
 
-    if item_hash.key?(:discount) && item_hash[:discount].key?(:type)
-      case item_hash[:discount][:type]
+    #Check if item has discount set in data store
+    has_discount = item.key?(:discount) && item[:discount].key?(:type)
+
+    # If item has discount, determine type and call appropriate discount method
+    if has_discount
+      case item[:discount][:type]
       when 'two_for_one'
-        item_total += two_for_one(item_hash[:price], count)
+        item_total += two_for_one(item[:price], item[:count])
       when 'half_price'
-        item_total += half_price(item_hash[:price], count, one_per_customer: item_hash[:discount][:one_per_customer])
+        item_total += half_price(item[:price], item[:count], one_per_customer: item[:discount][:one_per_customer])
       when 'buy_three_get_one_free'
-        item_total += buy_three_get_one_free(item_hash[:price], count)
+        item_total += buy_three_get_one_free(item[:price], item[:count])
       end
     else
-      item_total += item_hash[:price] * count
+      # Otherwise, calculate item total without discount
+      item_total += item[:price] * item[:count]
     end
 
     item_total
