@@ -1,8 +1,10 @@
-Sat, 12 Dec 2020 16:33:55 +0000
+Mon, 14 Dec 2020 16:09:04 +0000
 ./code-test.md	Tue, 24 Oct 2017 14:48:13 +0100
 ./spec/spec_helper.rb	Tue, 24 Oct 2017 14:47:56 +0100
-./spec/examples.txt	Sat, 12 Dec 2020 16:27:30 +0000
-./spec/checkout_spec.rb	Sat, 12 Dec 2020 16:28:33 +0000
-./lib/checkout.rb	Sat, 12 Dec 2020 16:29:26 +0000
+./spec/examples.txt	Mon, 14 Dec 2020 15:51:34 +0000
+./spec/checkout_spec.rb	Mon, 14 Dec 2020 15:48:00 +0000
+./git-log.log	Mon, 14 Dec 2020 16:06:49 +0000
+./lib/items.rb	Mon, 14 Dec 2020 15:51:08 +0000
+./lib/checkout.rb	Mon, 14 Dec 2020 15:43:29 +0000
 ./Gemfile	Tue, 24 Oct 2017 14:48:13 +0100
 ./Gemfile.lock	Tue, 24 Oct 2017 14:48:13 +0100

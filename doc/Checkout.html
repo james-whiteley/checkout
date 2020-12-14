@@ -87,9 +87,19 @@
     
     <li ><a href="#method-c-new">::new</a>
     
+    <li ><a href="#method-i-apply_discount">#apply_discount</a>
+    
+    <li ><a href="#method-i-basket">#basket</a>
+    
+    <li ><a href="#method-i-buy_three_get_one_free">#buy_three_get_one_free</a>
+    
+    <li ><a href="#method-i-half_price">#half_price</a>
+    
     <li ><a href="#method-i-scan">#scan</a>
     
     <li ><a href="#method-i-total">#total</a>
+    
+    <li ><a href="#method-i-two_for_one">#two_for_one</a>
     
   </ul>
 </div>
@@ -150,7 +160,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(prices)</span>
+            class="method-args">()</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -159,19 +169,16 @@
 
         <div class="method-description">
           
-          <p>Initialize item prices.</p>
-<dl class="rdoc-list note-list"><dt>prices
-<dd>
-<p>A hash of item prices.</p>
-</dd></dl>
+          <p>Initialize checkout</p>
           
           
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/checkout.rb, line 11</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">prices</span>)
-  <span class="ruby-ivar">@prices</span> = <span class="ruby-identifier">prices</span>
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 7</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>
+  <span class="ruby-ivar">@basket</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-ivar">@items</span> = <span class="ruby-constant">Items</span>.<span class="ruby-identifier">new</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -189,6 +196,43 @@
        <header>
          <h3>Public Instance Methods</h3>
        </header>
+
+    
+      <div id="method-i-basket" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">basket</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Get basket contents</p>
+
+<h3 id="method-i-basket-label-Returns">Returns<span><a href="#method-i-basket-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Returns immutable basket contents.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="basket-source">
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 60</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">basket</span>
+  <span class="ruby-ivar">@basket</span>.<span class="ruby-identifier">freeze</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
 
     
       <div id="method-i-scan" class="method-detail ">
@@ -214,9 +258,32 @@
 
           
           <div class="method-source-code" id="scan-source">
-            <pre><span class="ruby-comment"># File lib/checkout.rb, line 18</span>
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 15</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">scan</span>(<span class="ruby-identifier">item</span>)
-  <span class="ruby-identifier">basket</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">item</span>.<span class="ruby-identifier">to_sym</span>
+  <span class="ruby-keyword">begin</span>
+    <span class="ruby-comment"># Check if one of item is already in basket</span>
+    <span class="ruby-identifier">existing_item_key</span> = <span class="ruby-ivar">@basket</span>.<span class="ruby-identifier">index</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">basket_item</span><span class="ruby-operator">|</span> <span class="ruby-identifier">basket_item</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">item</span> }
+
+    <span class="ruby-comment"># If not an existing item, create new item in basket</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">existing_item_key</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-comment"># Get item from data store by name</span>
+      <span class="ruby-identifier">item_hash</span> = <span class="ruby-ivar">@items</span>.<span class="ruby-identifier">get_item</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">item</span>)
+
+      <span class="ruby-comment"># If item not found, raise an error</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">item_hash</span>.<span class="ruby-identifier">nil?</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">IOError</span>.<span class="ruby-identifier">new</span> <span class="ruby-string">&#39;Item not found.&#39;</span>
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-comment"># Else set the item count in the basket and push to basket array</span>
+        <span class="ruby-identifier">item_hash</span>[<span class="ruby-value">:count</span>] = <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@basket</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">item_hash</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-comment"># If existing item, increment the item&#39;s count in the basket</span>
+      <span class="ruby-ivar">@basket</span>[<span class="ruby-identifier">existing_item_key</span>][<span class="ruby-value">:count</span>] = <span class="ruby-ivar">@basket</span>[<span class="ruby-identifier">existing_item_key</span>][<span class="ruby-value">:count</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">IOError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+    <span class="ruby-identifier">e</span>
+  <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -251,27 +318,13 @@
 
           
           <div class="method-source-code" id="total-source">
-            <pre><span class="ruby-comment"># File lib/checkout.rb, line 26</span>
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 46</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">total</span>
   <span class="ruby-identifier">total</span> = <span class="ruby-value">0</span>
 
-  <span class="ruby-identifier">basket</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)) { <span class="ruby-operator">|</span><span class="ruby-identifier">items</span>, <span class="ruby-identifier">item</span><span class="ruby-operator">|</span> <span class="ruby-identifier">items</span>[<span class="ruby-identifier">item</span>] <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>; <span class="ruby-identifier">items</span> }.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">item</span>, <span class="ruby-identifier">count</span><span class="ruby-operator">|</span>
-    <span class="ruby-keyword">if</span> <span class="ruby-identifier">item</span> <span class="ruby-operator">==</span> <span class="ruby-value">:apple</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">item</span> <span class="ruby-operator">==</span> <span class="ruby-value">:pear</span>
-      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">count</span> <span class="ruby-operator">%</span> <span class="ruby-value">2</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>)
-        <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>) <span class="ruby-operator">*</span> (<span class="ruby-identifier">count</span> <span class="ruby-operator">/</span> <span class="ruby-value">2</span>)
-      <span class="ruby-keyword">else</span>
-        <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">count</span>
-      <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">item</span> <span class="ruby-operator">==</span> <span class="ruby-value">:banana</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">item</span> <span class="ruby-operator">==</span> <span class="ruby-value">:pineapple</span>
-      <span class="ruby-keyword">if</span> <span class="ruby-identifier">item</span> <span class="ruby-operator">==</span> <span class="ruby-value">:pineapple</span>
-        <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> (<span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>) <span class="ruby-operator">/</span> <span class="ruby-value">2</span>)
-        <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> (<span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>)) <span class="ruby-operator">*</span> (<span class="ruby-identifier">count</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)
-      <span class="ruby-keyword">else</span>
-        <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> (<span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>) <span class="ruby-operator">/</span> <span class="ruby-value">2</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">count</span>
-      <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">else</span>
-      <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">prices</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">item</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">count</span>
-    <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># Loop through basket items, apply discount and sum total.</span>
+  <span class="ruby-ivar">@basket</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">apply_discount</span>(<span class="ruby-identifier">item</span>)
   <span class="ruby-keyword">end</span>
 
   <span class="ruby-identifier">total</span>
@@ -309,6 +362,233 @@
     
 
     
+     <section id="private-instance-Internal-method-details" class="method-section">
+       <header>
+         <h3>Private Instance Methods</h3>
+       </header>
+
+    
+      <div id="method-i-apply_discount" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">apply_discount</span><span
+            class="method-args">(item)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Apply discount to item where applicable.</p>
+<dl class="rdoc-list note-list"><dt>item
+<dd>
+<p>Item hash</p>
+</dd></dl>
+
+<h3 id="method-i-apply_discount-label-Returns">Returns<span><a href="#method-i-apply_discount-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Returns the item total after applying discount.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="apply_discount-source">
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 71</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">apply_discount</span>(<span class="ruby-identifier">item</span>)
+  <span class="ruby-identifier">item_total</span> = <span class="ruby-value">0</span>
+
+  <span class="ruby-comment"># Check if item has discount set in data store</span>
+  <span class="ruby-identifier">has_discount</span> = <span class="ruby-identifier">item</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-value">:discount</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">item</span>[<span class="ruby-value">:discount</span>].<span class="ruby-identifier">key?</span>(<span class="ruby-value">:type</span>)
+
+  <span class="ruby-comment"># If item has discount, determine type and call appropriate discount method</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">has_discount</span>
+    <span class="ruby-keyword">case</span> <span class="ruby-identifier">item</span>[<span class="ruby-value">:discount</span>][<span class="ruby-value">:type</span>]
+    <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;two_for_one&#39;</span>
+      <span class="ruby-identifier">item_total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">two_for_one</span>(<span class="ruby-identifier">item</span>[<span class="ruby-value">:price</span>], <span class="ruby-identifier">item</span>[<span class="ruby-value">:count</span>])
+    <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;half_price&#39;</span>
+      <span class="ruby-identifier">item_total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">half_price</span>(<span class="ruby-identifier">item</span>[<span class="ruby-value">:price</span>], <span class="ruby-identifier">item</span>[<span class="ruby-value">:count</span>], <span class="ruby-value">one_per_customer:</span> <span class="ruby-identifier">item</span>[<span class="ruby-value">:discount</span>][<span class="ruby-value">:one_per_customer</span>])
+    <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;buy_three_get_one_free&#39;</span>
+      <span class="ruby-identifier">item_total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">buy_three_get_one_free</span>(<span class="ruby-identifier">item</span>[<span class="ruby-value">:price</span>], <span class="ruby-identifier">item</span>[<span class="ruby-value">:count</span>])
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-comment"># Otherwise, calculate item total without discount</span>
+    <span class="ruby-identifier">item_total</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">item</span>[<span class="ruby-value">:price</span>] <span class="ruby-operator">*</span> <span class="ruby-identifier">item</span>[<span class="ruby-value">:count</span>]
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">item_total</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-buy_three_get_one_free" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">buy_three_get_one_free</span><span
+            class="method-args">(item_price, count)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Apply buy three get one free discount to price of item in basket.</p>
+<dl class="rdoc-list note-list"><dt>item_price
+<dd>
+<p>Item price</p>
+</dd><dt>count
+<dd>
+<p>Count of item in basket</p>
+</dd></dl>
+
+<h3 id="method-i-buy_three_get_one_free-label-Returns">Returns<span><a href="#method-i-buy_three_get_one_free-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Returns total item price after discount applied.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="buy_three_get_one_free-source">
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 142</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">buy_three_get_one_free</span>(<span class="ruby-identifier">item_price</span>, <span class="ruby-identifier">count</span>)
+  <span class="ruby-comment"># Adjust count by removing one item from count for every for purchased</span>
+  <span class="ruby-identifier">discounted_count</span> = <span class="ruby-identifier">count</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">count</span> <span class="ruby-operator">/</span> <span class="ruby-value">4</span>)
+
+  <span class="ruby-identifier">item_price</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">discounted_count</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-half_price" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">half_price</span><span
+            class="method-args">(item_price, count, one_per_customer: false)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Apply half price discount to price of item in basket.</p>
+<dl class="rdoc-list note-list"><dt>item_price
+<dd>
+<p>Item price</p>
+</dd><dt>count
+<dd>
+<p>Count of item in basket</p>
+</dd><dt>one_per_customer
+<dd>
+<p>True/False apply discount to one/all of particular item in basket</p>
+</dd></dl>
+
+<h3 id="method-i-half_price-label-Returns">Returns<span><a href="#method-i-half_price-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Returns total item price after discount applied.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="half_price-source">
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 121</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">half_price</span>(<span class="ruby-identifier">item_price</span>, <span class="ruby-identifier">count</span>, <span class="ruby-value">one_per_customer:</span> <span class="ruby-keyword">false</span>)
+  <span class="ruby-identifier">price</span> = <span class="ruby-value">0</span>
+
+  <span class="ruby-comment"># If one_per_customer flag true only apply half price to one item of type</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">one_per_customer</span>
+    <span class="ruby-identifier">price</span> = <span class="ruby-identifier">item_price</span> <span class="ruby-operator">/</span> <span class="ruby-value">2</span>
+    <span class="ruby-identifier">price</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">item_price</span> <span class="ruby-operator">*</span> (<span class="ruby-identifier">count</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-comment"># Otherwise apply discount to all items of type</span>
+    <span class="ruby-identifier">price</span> = (<span class="ruby-identifier">item_price</span> <span class="ruby-operator">/</span> <span class="ruby-value">2</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">count</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">price</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-two_for_one" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">two_for_one</span><span
+            class="method-args">(item_price, count)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Apply two for one discount to price of item in basket.</p>
+<dl class="rdoc-list note-list"><dt>item_price
+<dd>
+<p>Item price</p>
+</dd><dt>count
+<dd>
+<p>Count of item in basket</p>
+</dd></dl>
+
+<h3 id="method-i-two_for_one-label-Returns">Returns<span><a href="#method-i-two_for_one-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Returns total item price after discount applied.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="two_for_one-source">
+            <pre><span class="ruby-comment"># File lib/checkout.rb, line 101</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">two_for_one</span>(<span class="ruby-identifier">item_price</span>, <span class="ruby-identifier">count</span>)
+  <span class="ruby-comment"># Calculate modulus, in this case either 0/1</span>
+  <span class="ruby-identifier">discount_modulus</span> = <span class="ruby-identifier">count</span> <span class="ruby-operator">%</span> <span class="ruby-value">2</span>
+
+  <span class="ruby-comment"># Half the count of only whole pairs of item</span>
+  <span class="ruby-identifier">discounted_count</span> = (<span class="ruby-identifier">count</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">discount_modulus</span>) <span class="ruby-operator">/</span> <span class="ruby-value">2</span>
+
+  <span class="ruby-comment"># Add the modulus back to give the discounted, adjusted count</span>
+  <span class="ruby-identifier">count_after_discount</span> = <span class="ruby-identifier">discounted_count</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">discount_modulus</span>
+
+  <span class="ruby-identifier">item_price</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">count_after_discount</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+    </section>
+  
   </section>
 
 </main>
