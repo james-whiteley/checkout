@@ -65,14 +65,13 @@ class Checkout
 
   # Internal: Apply discount to item where applicable.
   #
-  # item_price - Item price
-  # count - Count of item in basket
+  # item - Item hash
   #
   # Returns the item total after applying discount.
   def apply_discount(item)
     item_total = 0
 
-    #Check if item has discount set in data store
+    # Check if item has discount set in data store
     has_discount = item.key?(:discount) && item[:discount].key?(:type)
 
     # If item has discount, determine type and call appropriate discount method
@@ -100,15 +99,16 @@ class Checkout
   #
   # Returns total item price after discount applied.
   def two_for_one(item_price, count)
-    price = 0
+    # Calculate modulus, in this case either 0/1
+    discount_modulus = count % 2
 
-    if (count % 2 == 0)
-      price = item_price * (count / 2)
-    else
-      price = item_price * count
-    end
+    # Half the count of only whole pairs of item
+    discounted_count = (count - discount_modulus) / 2
 
-    price
+    # Add the modulus back to give the discounted, adjusted count
+    count_after_discount = discounted_count + discount_modulus
+
+    item_price * count_after_discount
   end
 
   # Internal: Apply half price discount to price of item in basket.
@@ -121,10 +121,12 @@ class Checkout
   def half_price(item_price, count, one_per_customer: false)
     price = 0
 
+    # If one_per_customer flag true only apply half price to one item of type
     if one_per_customer
       price = item_price / 2
       price += item_price * (count - 1)
     else
+      # Otherwise apply discount to all items of type
       price = (item_price / 2) * count
     end
 
@@ -138,14 +140,9 @@ class Checkout
   #
   # Returns total item price after discount applied.
   def buy_three_get_one_free(item_price, count)
-    price = 0
+    # Adjust count by removing one item from count for every for purchased
+    discounted_count = count - (count / 4)
 
-    if (count % 4 == 0)
-      price = item_price * (count - 1)
-    else
-      price = item_price * count
-    end
-
-    price
+    item_price * discounted_count
   end
 end

@@ -116,6 +116,26 @@ RSpec.describe Checkout do
       end
     end
 
+    context 'when a two for 1 applies on item and an odd number of items is purchased' do
+      before do
+        checkout.scan('pear')
+      end
+
+      it 'returns the discounted price for the basket' do
+        expect(total).to eq(15)
+      end
+    end
+
+    context 'when a two for 1 applies on item but only one item purchased' do
+      before do
+        5.times { checkout.scan('pear') }
+      end
+
+      it 'returns the discounted price for the basket' do
+        expect(total).to eq(45)
+      end
+    end
+
     context 'when a half price offer applies on bananas' do
       before do
         checkout.scan('banana')
@@ -144,6 +164,16 @@ RSpec.describe Checkout do
 
       it 'returns the discounted price for the basket' do
         expect(total).to eq(600)
+      end
+    end
+
+    context 'when a buy 3 get 1 free offer applies on item but 5 items are purchased' do
+      before do
+        5.times { checkout.scan('mango') }
+      end
+
+      it 'returns the discounted price for the basket' do
+        expect(total).to eq(800)
       end
     end
   end
